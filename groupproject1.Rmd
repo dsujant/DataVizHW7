@@ -1,0 +1,98 @@
+---
+title: "Data Visualization Using Plot_ly"
+author: "Diana and Cheikhou"
+date: "March 16, 2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+setwd("C:/Users/diana/DataViz")
+getwd()
+college <- read.csv("C:/Users/diana/DataViz/US_News_National_University_Rankings.csv")
+head(college)
+nrow(college)
+```
+
+```{r}
+groupbytype <- college %>% group_by (State, Type)  %>% 
+                     summarise(n=n())
+             
+
+p <- public%>% 
+  plot_ly() %>%
+  add_trace(x = ~State, y = ~n, type = 'bar', 
+             text = "Public", textposition = 'auto',
+             marker = list(color = 'rgb(158,202,225)',
+                           line = list(color = 'rgb(8,48,107)', width = 1.5)))
+
+p
+
+
+
+
+
+
+
+
+```
+
+```{r, warning=FALSE, message=FALSE}
+
+library(plotly)
+
+
+plot_ly(data = groupbytype, x = ~Type)
+```
+```{r}
+
+library(plotly)
+public <- groupbytype %>% filter(Type =='Public')
+public <- as.data.frame(public)
+public$Type <- names("Public")
+
+private <- groupbytype %>% filter(Type =='Private')
+private <- as.data.frame(private)
+private$Type <- names("Private")
+private
+
+
+bystate <-merge(public,private,by="State", all.x = T ,all.y = T)
+
+colnames(bystate) <- c("State","Public", "Private")
+bystate
+
+
+```
+
+```{r}
+
+p <- plot_ly(data = bystate, x = ~State, y = ~Public, type = 'bar', 
+             text ="Public",
+             name ="Public",
+             marker = list(color = 'rgb(158,202,225)',
+                           line = list(color = 'rgb(8,48,107)', width = 1.5))) %>%
+  add_trace(x = ~State, y = ~Private, type = 'bar', 
+            text = "Private",
+            name = "Private",
+            marker = list(color = 'rgb(58,200,225)',
+                          line = list(color = 'rgb(8,48,107)', width = 1.5))) %>%
+  layout(title = "Number of Colleges (Public & Private) By State",
+         barmode = 'group',
+         xaxis = list(title = "State"),
+         yaxis = list(title = "Count")) %>% 
+  config(collaborate = FALSE, 
+    displaylogo = FALSE, modeBarButtonsToRemove = list("resetScale2d", 
+        "sendDataToCloud", "zoom2d", "zoomIn2d", "zoomOut2d", 
+        "pan2d", "select2d", "lasso2d", "hoverClosestCartesian", 
+        "hoverCompareCartesian", "hoverClosestGl2d", "hoverClosestPie", 
+        "toggleHover", "resetViews", "toggleSpikelines"))
+
+p
+```
+
+
+
